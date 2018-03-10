@@ -184,7 +184,8 @@ exports.playCmd = rl => {
                         bucle();
                     } else {
                         log('INCORRECTO \n');
-                        biglog(score, 'red');
+                        log(`Fin del juego. Aciertos: ${score}`);
+                        biglog(score, 'magenta');
                         rl.prompt();
                     }
                 });
