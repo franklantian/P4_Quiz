@@ -163,22 +163,24 @@ exports.playCmd = rl => {
     let toBeResolved = [];
 
     for (i = 0; i < model.count(); i++) {
-        toBeResolved[i] = i;
+        toBeResolved.push(i);
     }
 
-    bucle = () => {
+    const bucle = () => {
             if(toBeResolved.length === 0){
                 log('No hay nada más que preguntar.\n');
                 log(`Fin del juego. Aciertos: ${score}`);
                 biglog(score, 'magenta');
+                rl.prompt();
             }else{
-                let idd = toBeResolved[Math.random()*toBeResolved.length];
-                let quiz = model.getByIndex(idd);
+                let id = toBeResolved[Math.floor(Math.random()*toBeResolved.length)];
+                let quiz = model.getByIndex(id);
                 rl.question(`${colorize(quiz.question + '? ', 'red')}`,answer =>{
 
                     if (trimm(answer) === trimm(quiz.answer)) {
                         score += 1;
                         log(`CORRECTO - Lleva ${score} aciertos.`);
+                        toBeResolved.splice(toBeResolved.indexOf(id),1)
                         bucle();
                     } else {
                         log('INCORRECTO \n');
