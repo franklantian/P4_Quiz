@@ -50,7 +50,7 @@ rl.on('line', (line) => {
             break;
 
         case'add':
-            cmds.addCmd(rl,args[1]);
+            cmds.addCmd(rl);
             break;
 
         case'delete':
