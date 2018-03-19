@@ -212,9 +212,58 @@ exports.testCmd = (rl,id) =>{
         .then(()=>{
             rl.prompt();
         });
-    
+
 };
 
+const  copy = text =>{
+
+    return new Promise((resolve,reject) => {
+        models.quiz.findAll()
+            .each(quiz =>{
+                text.push(quiz.id)
+            })
+            .then(() =>{
+                resolve(text);
+            })
+        });
+};
+
+
+
+const bucle =(rl,text,score) => {
+    return new Promise((resolve, reject) => {
+       let num = text[Math.floor(Math.random()*text.length)];
+        validateId(num)
+            .then(num => models.quiz.findById(num))
+            .then(quiz => {
+                if (text.length === 0) {
+                    log('No hay nada más que preguntar.\n');
+                    log(`Fin del juego. Aciertos: ${score}`);
+                    biglog(score, 'magenta');
+                    rl.prompt();
+                    resolve();
+                }
+                else {
+                    makeQuestion(rl, `${colorize(quiz.question + '? ', 'red')}`)
+                        .then(a => {
+                            if (trimm(a) === trimm(quiz.answer)) {
+                                score += 1;
+                                log(`CORRECTO - Lleva ${score} aciertos.`);
+                                text.splice(text.indexOf(num), 1)
+                                bucle(rl,text,score);
+                                resolve();
+                            } else {
+                                log('INCORRECTO \n');
+                                log(`Fin del juego. Aciertos: ${score}`);
+                                biglog(score, 'magenta');
+                                rl.prompt();
+                                resolve();
+                            }
+                        });
+                }
+            });
+    });
+};
 
 /**
  * Pregunta todos los quizzees existentes den el model en orden aleatorio.
@@ -222,6 +271,19 @@ exports.testCmd = (rl,id) =>{
  */
 exports.playCmd = rl => {
     let score = 0;
+    let toBeResolved = [];
+    copy(toBeResolved)
+        .then(() =>{
+            bucle(rl,toBeResolved,score);
+        })
+        .catch(error => {
+            errorlog(error.message);
+        })
+        .then(()=>{
+            rl.prompt();
+        });
+};
+    /*let score = 0;
     let toBeResolved = [];
 
     for (i = 0; i < model.count(); i++) {
@@ -256,7 +318,7 @@ exports.playCmd = rl => {
 
     };bucle();
 
-};
+};*/
 
 
 /**
