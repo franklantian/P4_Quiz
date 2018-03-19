@@ -187,26 +187,20 @@ exports.testCmd = (rl,id) =>{
     validateId(id)
         .then(id => models.quiz.findById(id))
         .then(quiz => {
-            if(!quiz){
+            if(!quiz) {
                 throw new Error(`No existe un quiz asociado al id = ${id}.`);
             }
-            process.stdout.isTTY && setTimeout(() => {rl.write(quiz.question)},0);
-            return makeQuestion(rl,'Introduzca la pregunta: ')
-                .then( q => {
-                    process.stdout.isTTY && setTimeout(()=>{rl.write(quiz.answer)},0);
-                    return makeQuestion(rl,'Introduza la respuesta : ')
-                        .then(a => {
-                            quiz.question = q;
-                            quiz.answer = a;
-                            return quiz;
-                        });
-                    ;                })
-        })
-        .then(quiz => {
-            return quiz.save();
-        })
-        .then(quiz => {
-            log(`Se ha cambiado el quiz ${colorize(quiz.id,'magenta')} por : ${quiz.question}${colorize('=>','magenta')}${quiz.answer}`);
+            makeQuestion(rl,`${colorize(quiz.question + '? ', 'red')}`)
+           .then(a => {
+               if (trimm(a) === trimm(quiz.answer)) {
+                   log('Su respuesta es correcta.\n');
+                   biglog("CORRECTO", 'green');
+               } else {
+                   log('Su respuesta es incorrecta.\n');
+                   biglog("INCORRECTO", 'red');
+               }
+            });
+
         })
         .catch(Sequelize.ValidationError, error => {
             errorlog('El quiz es erroneo : ');
@@ -218,34 +212,7 @@ exports.testCmd = (rl,id) =>{
         .then(()=>{
             rl.prompt();
         });
-
-    /*if(typeof id === "undefined") {
-        errorlog(`Falta el parámetro id.`);
-        rl.prompt();
-    }else{
-        try{
-            const quiz = model.getByIndex(id);
-            rl.question(`${colorize(quiz.question + '? ', 'red')}`,answer => {
-
-                if (trimm(answer) === trimm(quiz.answer)) {
-                    log('Su respuesta es correcta.\n')
-                    biglog("CORRECTO", 'green');
-                    rl.prompt();
-                } else {
-                    log('Su respuesta es incorrecta.');
-                    biglog("INCORRECTO", 'red');
-                    rl.prompt();
-                }
-                rl.prompt();
-            });
-
-
-
-        }catch (error){
-            errorlog(error.message);
-            rl.prompt();
-        }
-    }*/
+    
 };
 
 
