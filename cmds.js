@@ -215,7 +215,7 @@ exports.testCmd = (socket,rl,id) =>{
 
 };
 
-const  copy = text =>{
+const  copy = (socket,text) =>{
 
     return new Promise((resolve,reject) => {
         models.quiz.findAll()
@@ -230,7 +230,7 @@ const  copy = text =>{
 
 
 
-const bucle =(rl,text,score) => {
+const bucle =(socket,rl,text,score) => {
     return new Promise((resolve, reject) => {
        let num = text[Math.floor(Math.random()*text.length)];
         validateId(num)
@@ -272,9 +272,9 @@ const bucle =(rl,text,score) => {
 exports.playCmd = (socket,rl) => {
     let score = 0;
     let toBeResolved = [];
-    copy(toBeResolved)
+    copy(socket,toBeResolved)
         .then(() =>{
-            bucle(rl,toBeResolved,score);
+            bucle(socket,rl,toBeResolved,score);
         })
         .catch(error => {
             errorlog(socket,error.message);
